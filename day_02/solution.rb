@@ -7,14 +7,25 @@ items = rows.map { |row| row.split(" ") }.map do |item|
   item
 end
 
-def valid?(range, letter, password)
-  occurrences = password.count(letter)
+## Part 1
+# def valid?(range, letter, password)
+#   occurrences = password.count(letter)
 
-  if (occurrences >= range.first and occurrences <= range.last)
-    true
-  else
-    false
-  end
+#   if (occurrences >= range.first and occurrences <= range.last)
+#     true
+#   else
+#     false
+#   end
+# end
+
+## Part 2
+#
+
+def valid?(indices, letter, password)
+  a = (password[(indices.first - 1)] == letter)
+  b = (password[(indices.last - 1)] == letter)
+
+  (a || b) && !(a && b)
 end
 
 valid_count = 0
