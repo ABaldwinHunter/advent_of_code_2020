@@ -54,6 +54,47 @@ class Seat
   end
 end
 
-seats = File.read("input.txt").split("\n")
- puts seats.map { |s| Seat.new(s).id }.max
+# part I
+#
+seats = File.read("input.txt").split("\n").map { |s| Seat.new(s) }
 
+puts seats.map(&:id).max
+
+# part II
+#
+#
+
+# sorted = seats.sort_by { |s| "#{s.row} #{s.column}" }
+
+# sorted.each do |seat|
+#   p "row #{seat.row} col #{seat.column}"
+# end
+
+plane = {}
+
+(0..127).each do |num|
+  plane[num] = []
+end
+
+seats.each do |seat|
+  plane[seat.row] << seat
+end
+
+rows_missing_seats = plane.select { |row, seats| seats.length < 8 && seats.length > 0 }.values
+
+missing_seat_ids = []
+
+rows_missing_seats.each do |row|
+  row_num = row.first.row
+  cols_present = row.map { |seat| seat.column }
+
+  missing_cols = (0..7).select { |num| cols_present.none? num }
+
+  missing_cols.each { |col| missing_seat_ids << (8 * row_num + col) }
+end
+
+all_ids = seats.map(&:id)
+
+my_seat_id = missing_seat_ids.select { |id| all_ids.include?(id - 1) && all_ids.include?(id + 1) }
+
+puts "my seat id: #{my_seat_id}"
