@@ -61,14 +61,6 @@ seats = File.read("input.txt").split("\n").map { |s| Seat.new(s) }
 puts seats.map(&:id).max
 
 # part II
-#
-#
-
-# sorted = seats.sort_by { |s| "#{s.row} #{s.column}" }
-
-# sorted.each do |seat|
-#   p "row #{seat.row} col #{seat.column}"
-# end
 
 plane = {}
 
