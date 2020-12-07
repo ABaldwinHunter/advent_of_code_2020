@@ -1,62 +1,46 @@
 # bags  galore
 # 1 shiny gold bag
 #
-rules = File.read("input.txt").split("\n")
 
-class Bag
-  attr_accessor :type
+FILE = "input.txt"
+# FILE = "sample.txt"
 
-  def initialize(type:)
-    @type = type
-  end
+BAG_MAP = begin
+            map = {}
 
-  def children
-  end
-end
+            rules = File.read(FILE).split("\n")
 
-bag_map = {}
+            rules.each do |rule|
+              type = rule.split(" bags contain ").first
 
-rules.each do |rule|
-  type = rule.split(" bags contain ").first
+              contents = rule.split(" bags contain ").last
 
-  contents = rule.split(" bags contain ").last
+              content_types = (contents.split /\d+ /).map { |item| item.split(" bag").first }.compact
 
-  content_types = (contents.split /\d+/).map { |item| item.split("bag").first }
-
-  bag_map[type] = content_types
-end
+              map[type] = content_types
+            end
+            map
+          end
 
 # Part I
-# find shiny gold bag owners
-#
-# shiny_gold_bag_owners = []
 
-# bag_map.each do |type, bags|
-#   if bags.include? "shiny gold"
-#     shiny_gold_bag_owners << type
-#   end
-# end
 
-# outermost_parents = []
+BAG_TYPES = BAG_MAP.keys
+BAG_CONTENTS = BAG_MAP.values.flatten.uniq
 
-# def find_outermost_bag(child_type:, outermost_bags: [])
-#   new_parents = []
+OUTERMOST_NODES = BAG_TYPES.select { |type| !BAG_CONTENTS.include? type }
+LEAF_NODES = BAG_TYPES.select { |type| !BAG_TYPES.include?(type) || BAG_MAP[type] == ["no other"] }
 
-#   bag_map.each do |type, contents|
-#     if contents.include? child_type
-#       new_parents << type
-#     end
-#   end
+def contains_gold?(type:)
+  if BAG_MAP[type].include? 'shiny gold'
+    true
+  elsif LEAF_NODES.include?(type)
+    false
+  else
+    BAG_MAP[type].any? { |type| contains_gold?(type: type) }
+  end
+end
 
-#   if new_parents.none?
-#     outermost_bags << child_type
+nodes = BAG_TYPES.select { |node| contains_gold?(type: node) }
 
-#     outermost_bags
-#   else
-#     new_parents.each do |new_type|
-#       outermost_bags << find_outermost_bag(child_type: new_type, outermost_bags: outermost_bags)
-#     end
-#   end
-# end
-
-# find_outermost_bag(child_type: "shiny gold", outermost_bags: [])
+puts "Answer is #{nodes.count}"
