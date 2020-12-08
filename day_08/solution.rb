@@ -35,14 +35,16 @@ def execute_instructions(instructions:, visited:, current_index:, accumulator: 0
   end
 end
 
-# execute_instructions(instructions: instructions, visited: [], current_index: 0, accumulator: 0)
+execute_instructions(instructions: instructions, visited: [], current_index: 0, accumulator: 0)
 
 # part II
 #
 # brute force
-#
-already_tried = []
 
+# hackiest thing ever - ran the method below without reference to this constant, and got System stack level too deep error, with 5447 levels
+#
+# So, I just copy pasted the "already_tested" output into this constant, and then didn't test those :D
+#
 NOT_IT = [1, 188, 315, 363, 438, 468, 145, 64, 131, 58, 60, 333, 260, 261, 271, 272, 207, 209, 210, 227, 571, 380, 581, 541, 327, 354, 250, 251, 253, 449, 193, 195, 197, 298, 301, 525, 526, 42, 442, 578, 352, 24, 26, 283, 180, 90, 6, 8, 9]
 
 def execute_instructions(instructions:, visited:, current_index:, accumulator:, currently_testing:, already_tested:)
