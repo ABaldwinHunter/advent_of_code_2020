@@ -44,3 +44,14 @@ end
 nodes = BAG_TYPES.select { |node| contains_gold?(type: node) }
 
 puts "Answer is #{nodes.count}"
+
+# Part II
+#
+#
+def count_children(type:, so_far:)
+  if BAG_MAP[type] == ["no other"]
+    so_far
+  else
+    so_far
+  end
+end
