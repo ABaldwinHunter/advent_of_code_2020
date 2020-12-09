@@ -1,5 +1,5 @@
 #
-# part I brute force solution
+# part I
 #
 NUMS = File.read("input.txt").split("\n").map(&:to_i)
 
@@ -44,3 +44,35 @@ NUMS.each_with_index do |num, i|
 
   end
 end
+# Found it! 21806024
+#
+
+# Part II
+#
+
+TARGET = 21806024
+
+# range_start = 0
+# range_end = 0
+# sum = 0
+
+# while sum != TARGET
+#   puts "sum: #{sum}, range_start: #{range_start}, range_end: #{range_end}"
+
+#   if sum > TARGET
+#     sum -= NUMS[range_start]
+#     range_start += 1
+#   elsif sum < TARGET
+#     range_end += 1
+#     sum += NUMS[range_end]
+#   end
+# end
+
+# puts "Done! Range start: #{range_start}, range_end: #{range_end}, sum: #{sum}"
+
+# contiguous_set = NUMS[range_start..range_end]
+
+# min = contiguous_set.min
+# max = contiguous_set.max
+
+# puts "Min is #{min}, max is #{max}, sum is #{(min + max)}"
