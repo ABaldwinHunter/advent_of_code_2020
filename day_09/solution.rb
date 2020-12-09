@@ -52,27 +52,31 @@ end
 
 TARGET = 21806024
 
-# range_start = 0
-# range_end = 0
-# sum = 0
+NUMS.each.with_index do |num, i|
+  range_start = i
+  range_end = i
+  sum = num
 
-# while sum != TARGET
-#   puts "sum: #{sum}, range_start: #{range_start}, range_end: #{range_end}"
+  while TARGET != sum && NUMS[range_end]
+    if sum > TARGET
+      sum -= NUMS[range_start]
+      range_start += 1
+    elsif sum < TARGET
+      range_end += 1
 
-#   if sum > TARGET
-#     sum -= NUMS[range_start]
-#     range_start += 1
-#   elsif sum < TARGET
-#     range_end += 1
-#     sum += NUMS[range_end]
-#   end
-# end
+      sum += NUMS[range_end] if NUMS[range_end]
+    end
+  end
 
-# puts "Done! Range start: #{range_start}, range_end: #{range_end}, sum: #{sum}"
+  if sum == TARGET
+    puts "Done! Range start: #{range_start}, range_end: #{range_end}, sum: #{sum}"
 
-# contiguous_set = NUMS[range_start..range_end]
+    contiguous_set = NUMS[range_start..range_end]
 
-# min = contiguous_set.min
-# max = contiguous_set.max
+    min = contiguous_set.min
+    max = contiguous_set.max
 
-# puts "Min is #{min}, max is #{max}, sum is #{(min + max)}"
+    puts "Min is #{min}, max is #{max}, sum is #{(min + max)}"
+    break
+  end
+end
