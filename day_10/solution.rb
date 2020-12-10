@@ -1,5 +1,5 @@
-FILE_NAME = 'input.txt'
-# FILE_NAME = 'sample.txt'
+# FILE_NAME = 'input.txt'
+FILE_NAME = 'sample.txt'
 # FILE_NAME = 'larger_sample.txt'
 
 adapters = File.read(FILE_NAME).split("\n").map(&:to_i)
@@ -33,29 +33,84 @@ puts "One jolt differences = #{one_jolt_differences}. Three jolt: #{three_jolt_d
 #
 # Whenever there is one that can be switched out it is like an extra input to a combinatorics
 #
-
-# (0), 1, 4, 5, 6, 7, 10, 11, 12, 15, 16, 19, (22)
-# (0), 1, 4, 5, 6, 7, 10, 12, 15, 16, 19, (22)
-# (0), 1, 4, 5, 7, 10, 11, 12, 15, 16, 19, (22)
-# (0), 1, 4, 5, 7, 10, 12, 15, 16, 19, (22)
-# (0), 1, 4, 6, 7, 10, 11, 12, 15, 16, 19, (22)
-# (0), 1, 4, 6, 7, 10, 12, 15, 16, 19, (22)
-# (0), 1, 4, 7, 10, 11, 12, 15, 16, 19, (22)
-# (0), 1, 4, 7, 10, 12, 15, 16, 19, (22)
-
-fixed_segments = []
-dynamic_segments  = []
+# the answer seems related to the three and  one jolt jumps
 
 # array.combination
 #
 # multiply the number of possibilities in the dynamic sections
 
-current_segment = []
-segment_start = 0 # include start and end of previous segment
-latest_segment_adapter = 0
+three_jolt_markers = []
+
+last_adapter = 0;
 
 sorted.each.with_index do |adapter, index|
-  diff = adapter - latest_segment_adapter
-  if diff <= 3 # continue segment
+  diff = adapter - last_adapter
 
+  if diff == 3
+    three_jolt_markers << index
+  end
+
+  last_adapter = adapter
 end
+
+last = 0
+changeables = []
+
+three_jolt_markers.each do |index|
+  distance = index - last
+
+  if distance > 1
+    start = last + 1
+    stop = index - 1
+
+    changeables << sorted[(start.to_i)..(stop.to_i)]
+    last = index
+  else
+    last = index
+    next
+  end
+end
+
+puts "changeables are:"
+
+p changeables
+
+# calculate possibilities for each changable section
+#
+
+without_too_many_blanks = changeables.map do |changeable_section|
+  length = changeable_section.length
+
+  length.times do |_i|
+    changeable_section << "blank"
+  end
+
+  combos = changeable_section.combination(length).to_a
+
+  puts "combos:"
+  p combos
+
+  combos.reject do |combo|
+    # can't have more than three blanks in a row
+    combo.map(&:to_s).sort.join("").include?("blankblankblank") || combo.uniq.all? { |item| item == "blank" }
+  end
+end
+
+puts "pruned:"
+p without_too_many_blanks
+
+unique_options = without_too_many_blanks.map { |ary| ary.uniq }
+
+puts "unique options:"
+
+p unique_options
+
+possibilities = unique_options.map(&:count)
+
+puts "Calculating"
+
+puts "possibilities: #{possibilities}"
+
+answer = possibilities.inject(:*)
+
+puts "answer is #{answer}"
