@@ -48,10 +48,53 @@ puts "Answer is #{nodes.count}"
 # Part II
 #
 #
-def count_children(type:, so_far:)
-  if BAG_MAP[type] == ["no other"]
+
+BAG_MAP_2 = begin
+              map = {}
+
+              rules = File.read(FILE).split("\n")
+
+              rules.each do |rule|
+                type = rule.split(" bags contain ").first
+
+                contents = rule.split(" bags contain ").last
+
+                content_types = (contents.split /\d+ /).map { |item| item.split(" bag").first }.compact
+
+                with_nums = []
+
+                content_types.each do |t|
+                  quant = contents.split(t).first.to_i
+
+                  with_nums << [quant, t]
+                end
+
+                map[type] = with_nums
+              end
+              map
+            end
+
+def count_children(color:, so_far: 0)
+  puts "color is #{color}"
+  # puts "so far is #{so_far}"
+  if color == "no other"
     so_far
   else
+    BAG_MAP_2[color].each do |arry_content|
+      so_far += arry_content.first
+    end
+
+    old_so_far = so_far
+
+    BAG_MAP_2[color].each do |arry_content|
+      num = arry_content.first
+      col = arry_content.last
+
+      so_far += num * count_children(color: col, so_far: old_so_far)
+    end
+
     so_far
   end
 end
+
+puts count_children(color: "shiny gold")
