@@ -3,7 +3,8 @@
 #
 
 FILE = "input.txt"
-# FILE = "sample.txt"
+# # FILE = "sample.txt"
+# FILE = "sample_two.txt"
 
 BAG_MAP = begin
             map = {}
@@ -43,7 +44,7 @@ end
 
 nodes = BAG_TYPES.select { |node| contains_gold?(type: node) }
 
-puts "Answer is #{nodes.count}"
+puts "Part I answer is #{nodes.count}"
 
 # Part II
 #
@@ -63,8 +64,10 @@ BAG_MAP_2 = begin
 
                 with_nums = []
 
-                content_types.each do |t|
-                  quant = contents.split(t).first.to_i
+                content_types.each.with_index do |t, indx|
+                  parts = contents.split(",")
+
+                  quant = parts[indx].split(t).first.to_i
 
                   with_nums << [quant, t]
                 end
@@ -74,27 +77,26 @@ BAG_MAP_2 = begin
               map
             end
 
-def count_children(color:, so_far: 0)
-  puts "color is #{color}"
-  # puts "so far is #{so_far}"
+# for each bag we want its own children, plus their children
+
+def count_children(color:)
   if color == "no other"
-    so_far
+    0
   else
-    BAG_MAP_2[color].each do |arry_content|
-      so_far += arry_content.first
-    end
+    children_counts = BAG_MAP_2[color].map { |content_arry| content_arry.first }
+    children = children_counts.inject(0) { |sum,x| sum + x }
 
-    old_so_far = so_far
+    ary = BAG_MAP_2[color]
 
-    BAG_MAP_2[color].each do |arry_content|
+    ary.each do |arry_content|
       num = arry_content.first
       col = arry_content.last
 
-      so_far += num * count_children(color: col, so_far: old_so_far)
+      children += num * count_children(color: col)
     end
 
-    so_far
+    children
   end
 end
 
-puts count_children(color: "shiny gold")
+puts "Part II answer is #{count_children(color: "shiny gold")}"
