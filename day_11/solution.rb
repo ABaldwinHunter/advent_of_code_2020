@@ -2,71 +2,20 @@ OCCUPIED = "#"
 FLOOR = "."
 EMPTY = "L"
 
-rows = File.read("input.txt").split("\n").map! { |row| row.split("") } # array of arrays
+# FILE = 'input.txt'
+FILE = 'sample.txt'
 
 
-# class Spot
-#   OCCUPIED = "#"
-#   FLOOR = "."
-#   EMPTY = "L"
+rows = File.read(FILE).split("\n").map! { |row| row.split("") } # array of arrays
 
-#   attr_accessor :x, :y, :contents
+def print_board(rows)
+  rows.each do |row|
+    puts row.join(" ")
+  end
 
-#   def occupied?
-#     contents == EMPTY
-#   end
+  sleep 0.5
+end
 
-#   def floor?
-#     contents == FLOOR
-#   end
-
-#   def neighbor_coordinates
-#     [
-#       north,
-#       south,
-#       east,
-#       west,
-#       north_west,
-#       north_east,
-#       south_west,
-#       south_east,
-#     ]
-#   end
-
-#   def north
-#     [x, (y + 1)]
-#   end
-
-#   def south
-#     [x, (y - 1)]
-#   end
-
-#   def east
-#     [(x + 1), y]
-#   end
-
-#   def west
-#     [(x - 1), y]
-#   end
-
-#   def north_west
-#     [(x - 1), (y + 1)]
-#   end
-
-#   def north_east
-#     [(x + 1), (y + 1)]
-#   end
-
-#   def south_west
-#     [(x - 1), (y - 1)]
-#   end
-
-#   def south_east
-#     [(x + 1), (y - 1)]
-#   end
-# end
-
-current_state = rows
 seats_to_become_empty = [] #  represent as [x,] coordinates
 seats_to_become_occupied  = [] # ''
 
@@ -81,7 +30,7 @@ def adjacent_cells(rows, coordinates)
   east =  [(row_index + 1), col_index]
   west = [(row_index - 1), col_index]
   north_west = [(row_index - 1), (col_index + 1)]
-  south_west = [(row_index -  1), (col_index - 1)]
+  south_west = [(row_index - 1), (col_index - 1)]
   north_east = [(row_index + 1), (col_index + 1)]
   south_east = [(row_index + 1), (col_index - 1)]
 
@@ -96,17 +45,18 @@ def adjacent_cells(rows, coordinates)
   end.compact
 end
 
-while consecutive_times_no_changes < 2
+while consecutive_times_no_changes < 3
   # loop
+  #
+  print_board(rows)
+
   rows.each_with_index do |row, row_index|
     row.each_with_index do |seat, col_index|
       current_coordinates = [row_index, col_index]
 
-      if seat  == FLOOR
-        next
-      elsif seat == EMPTY
+      if seat == EMPTY
         # if there are no occupied adjacent seats next to it, becomes occupied
-        neighbors  = adjacent_cells(rows,  current_coordinates)
+        neighbors = adjacent_cells(rows,  current_coordinates)
 
         if neighbors.all? { |seat| seat ==  EMPTY }
           seats_to_become_occupied << current_coordinates
@@ -122,17 +72,22 @@ while consecutive_times_no_changes < 2
     end
   end
 
+  puts "seats to become empty: "
+  p seats_to_become_empty
+  puts "seats_to_become_occupied: "
+  p seats_to_become_occupied
+
   if seats_to_become_empty.none? && seats_to_become_occupied.none?
     consecutive_times_no_changes += 1
   else
     consecutive_times_no_changes = 0
 
     seats_to_become_empty.each do |coordinates|
-      rows[coordinates.first][coordinates[1]] = EMPTY
+      rows[coordinates.first][coordinates.last] = EMPTY
     end
 
     seats_to_become_occupied.each do |coordinates|
-      rows[coordinates.first][coordinates[1]] = OCCUPIED
+      rows[coordinates.first][coordinates.last] = OCCUPIED
     end
 
     seats_to_become_empty = []
@@ -143,5 +98,3 @@ end
 occupied_seat_count = rows.map { |row| row.join("") }.join("").count(OCCUPIED)
 
 puts "Occupied seat count is #{occupied_seat_count}!"
-
-
