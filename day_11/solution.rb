@@ -2,11 +2,9 @@ OCCUPIED = "#"
 FLOOR = "."
 EMPTY = "L"
 
-# FILE = 'input.txt'
-FILE = 'sample.txt'
+FILE = 'input.txt'
+# FILE = 'sample.txt'
 
-
-rows = File.read(FILE).split("\n").map! { |row| row.split("") } # array of arrays
 
 def print_board(rows)
   rows.each do |row|
@@ -16,28 +14,30 @@ def print_board(rows)
   sleep 0.5
 end
 
-seats_to_become_empty = [] #  represent as [x,] coordinates
-seats_to_become_occupied  = [] # ''
+# [
+#   [1,2,3],
+#   [4,5,6],
+#   [4,5,6],
+# ]
 
-consecutive_times_no_changes = 0
 
-def adjacent_cells(rows, coordinates)
+def adjacent_cells(rows, coordinates) # [row_index, col_index]
   row_index = coordinates.first
   col_index = coordinates.last
 
-  north = [row_index, (col_index + 1)]
-  south = [row_index, (col_index - 1)]
-  east =  [(row_index + 1), col_index]
-  west = [(row_index - 1), col_index]
-  north_west = [(row_index - 1), (col_index + 1)]
-  south_west = [(row_index - 1), (col_index - 1)]
-  north_east = [(row_index + 1), (col_index + 1)]
-  south_east = [(row_index + 1), (col_index - 1)]
+  east = [row_index, (col_index + 1)]
+  west = [row_index, (col_index - 1)]
+  south =  [(row_index + 1), col_index]
+  north = [(row_index - 1), col_index]
+  north_east = [(row_index - 1), (col_index + 1)]
+  north_west = [(row_index - 1), (col_index - 1)]
+  south_east = [(row_index + 1), (col_index + 1)]
+  south_west = [(row_index + 1), (col_index - 1)]
 
   neighbor_coordinates = [north, south, east, west, north_west, south_west, north_east, south_east]
 
   neighbor_coordinates.map do |coord|
-    if (pos = rows[coord.first] && rows[coord.first][coord.last])
+    if (coord.all? { |num| num >= 0 }) && (pos = rows[coord.first] && rows[coord.first][coord.last])
       if [EMPTY, OCCUPIED].include?(pos) # ignore floor
         pos
       end
@@ -45,10 +45,17 @@ def adjacent_cells(rows, coordinates)
   end.compact
 end
 
-while consecutive_times_no_changes < 3
+rows = File.read(FILE).split("\n").map! { |row| row.split("") } # array of arrays
+
+seats_to_become_empty = [] #  represent as [x,] coordinates
+seats_to_become_occupied  = [] # ''
+
+consecutive_times_no_changes = 0
+
+while consecutive_times_no_changes < 1
   # loop
   #
-  print_board(rows)
+  # print_board(rows)
 
   rows.each_with_index do |row, row_index|
     row.each_with_index do |seat, col_index|
@@ -71,11 +78,6 @@ while consecutive_times_no_changes < 3
       end
     end
   end
-
-  puts "seats to become empty: "
-  p seats_to_become_empty
-  puts "seats_to_become_occupied: "
-  p seats_to_become_occupied
 
   if seats_to_become_empty.none? && seats_to_become_occupied.none?
     consecutive_times_no_changes += 1
