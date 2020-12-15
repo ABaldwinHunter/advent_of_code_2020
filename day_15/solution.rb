@@ -14,9 +14,9 @@ turn = 7
 last_spoken = 0
 
 PART_1 = 2021
-PART_2 = 300_000_001
+PART_2 = 30000001
 
-while turn < 2021
+while turn < PART_2
   if num_map[last_spoken].length > 1 # had been spoken before
     length = num_map[last_spoken].length
 
@@ -38,6 +38,8 @@ while turn < 2021
   end
 
   turn += 1
+
+  puts "Turn is #{turn}"
 end
 
 puts "last spoken is #{last_spoken}"
