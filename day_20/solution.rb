@@ -13,6 +13,12 @@ class Tile
     @body = body
   end
 
+  def matches_edge?(edge)
+    [north_edge, south_edge, east_edge, west_edge].any? do |e|
+      e == edge || e.reverse == edge
+    end
+  end
+
   def matches_any_edge?(other)
     other_edges = [other.north_edge, other.south_edge, other.east_edge, other.west_edge]
 
@@ -53,47 +59,41 @@ class Tile
     @starting_west_edge ||= body.map { |row| row.first }
   end
 
-  # [
-  #   [2,1,3]
-  #   [2,3,4]
-  #   [1,2,5]
-  # ]
+  def rotate_right!
+    old_north = north_edge
+    old_south = south_edge
+    old_east = east_edge
+    old_west = west_edge
 
-  # def rotate_right!
-  #   old_north = north_edge
-  #   old_south = south_edge
-  #   old_east = east_edge
-  #   old_west = west_edge
+    east_edge = old_north
+    south_edge = old_east
+    west_edge = old_south
+    north_edge = old_west
+  end
 
-  #   east_edge = old_north
-  #   south_edge = old_east
-  #   west_edge = old_south
-  #   north_edge = old_west
-  # end
+  def rotate_left!
+    old_north = north_edge
+    old_south = south_edge
+    old_east = east_edge
+    old_west = west_edge
 
-  # def rotate_left!
-  #   old_north = north_edge
-  #   old_south = south_edge
-  #   old_east = east_edge
-  #   old_west = west_edge
+    east_edge = old_south
+    south_edge = old_west
+    west_edge = old_north
+    north_edge = old_east
+  end
 
-  #   east_edge = old_south
-  #   south_edge = old_west
-  #   west_edge = old_north
-  #   north_edge = old_east
-  # end
+  def rotate_180!
+    old_north = north_edge
+    old_south = south_edge
+    old_east = east_edge
+    old_west = west_edge
 
-  # def rotate_180!
-  #   old_north = north_edge
-  #   old_south = south_edge
-  #   old_east = east_edge
-  #   old_west = west_edge
-
-  #   east_edge = old_west
-  #   south_edge = old_north
-  #   west_edge = old_east
-  #   north_edge = old_south
-  # end
+    east_edge = old_west
+    south_edge = old_north
+    west_edge = old_east
+    north_edge = old_south
+  end
 end
 
 # board is 3 X 3
@@ -112,35 +112,17 @@ tiles = split_tiles.map do |tile_str|
 
   lines = tile_str.split("\n")
 
-  puts "lines"
-
-  p lines
-
   id_line = lines.shift
-
-  puts "id line"
-
-  p id_line
 
   id = id_line.split("Tile ").last.split(":").first.to_i
 
   Tile.new(id: id, body: lines.map { |row| row.split("") })
 end
 
-puts "tiles are: "
-
-p tiles
-
-# approach 1
-# first, make a list or data structure of all the matching edges
-# the corner tiles will be the only ones that only have two matching edges with other tiles
-#
-
 matches = {} # tile_id => [matching tiles]
 
 tiles.each do |tile|
   tile_matches = []
-  # require 'pry'; binding.pry
 
   # not the most performant. n2 here i think
   tiles.each do |t|
@@ -155,30 +137,69 @@ end
 puts "matches are: "
 p matches
 
-corners = matches.select do |tile_id, matches|
+corner_ids = matches.select do |tile_id, matches|
   matches.uniq.count == 2
 end.keys
 
-puts "corners"
-p corners
-
-puts "corner_ids are #{corners}"
-
-answer = corners.inject(:*)
-
-# Part I
-puts "Answer is #{answer}"
+edge_piece_ids = matches.select do |title_id, matches|
+  matches.uniq.count == 3
+end.keys
 
 # Part II
 #
+# actually orient whole board
+# remve tile boarders
+# then find the sea monsters
 #
 area = tiles.length
 square_side = Math.sqrt(area)
 
 board = []
 
-tiles.each_slice(3) do |a|
+tiles.each_slice(square_side) do |a|
   board << a
+end
+
+# build the edges, then the inside
+#
+
+puzzle_booard = []
+
+square_side.times do
+  table_top << []
+end
+
+corners = tiles.select { |tile| corner_ids.include? tile.id }
+edge_pieces = tiles.select { |tile| edge_piece_ids.include? tile.id }
+middle_pieces = tiles.reject { |tile| corner_ids.include?(tile.id) || edge_piece_ids.include?(title.id) }
+
+first_corner = corners.first
+
+# make sure north and west sides don't match any other sides
+#
+
+outer_edges = []
+
+north_is_outer = tiles.none? { |t| t.matches_edge?(first_corner.north) }
+west_is_outer = tiles.none? { |t| t.matches_edge?(first_corner.north) }
+
+while !(north_is_outer && west_is_outer)
+  first_corner.rotate_left!
+
+  north_is_outer = tiles.none? { |t| t.matches_edge?(first_corner.north) }
+  west_is_outer = tiles.none? { |t| t.matches_edge?(first_corner.north) }
+end
+
+puzzle_board.first << corners.first # should be oriented
+
+while puzzle_board.first.length < square_side # fill first row
+  (edge_pieces + corners).each do |tile|
+    latest = puzzle_board.first.last
+
+    if tile.matches_edge?(latest.east_edge) && tile.id != latest.id
+      puzzle_board.first << tile
+    end
+  end
 end
 
 
