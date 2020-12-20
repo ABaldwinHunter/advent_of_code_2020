@@ -17,7 +17,7 @@ class Tile
     other_edges = [other.north_edge, other.south_edge, other.east_edge, other.west_edge]
 
     [north_edge, south_edge, east_edge, west_edge].any? do |edge|
-      other_edges.include? edge
+      other_edges.include?(edge) || other_edges.include?(edge.reverse)
     end
   end
 
@@ -46,11 +46,11 @@ class Tile
   end
 
   def starting_east_edge
-    @starting_west_edge ||= body.map { |row| row.last }
+    @starting_east_edge ||= body.map { |row| row.last }
   end
 
   def starting_west_edge
-    @starting_east_edge ||= body.map { |row| row.first }
+    @starting_west_edge ||= body.map { |row| row.first }
   end
 
   # [
@@ -98,8 +98,8 @@ end
 
 # board is 3 X 3
 #
-# FILE = "tiles.txt"
-FILE = "sample.txt"
+FILE = "tiles.txt"
+# FILE = "sample.txt"
 
 split_tiles = File.read(FILE).split /\n{2,}/
 
@@ -149,12 +149,11 @@ matches = {} # tile_id => [matching tiles]
 
 tiles.each do |tile|
   tile_matches = []
-
-  require 'pry'; binding.pry
+  # require 'pry'; binding.pry
 
   # not the most performant. n2 here i think
   tiles.each do |t|
-    if tile.matches_any_edge?(t)
+    if (t.id != tile.id) && tile.matches_any_edge?(t)
       tile_matches << t.id
     end
   end
