@@ -131,15 +131,6 @@ puts "tiles are: "
 
 p tiles
 
-area = tiles.length
-square_side = Math.sqrt(area)
-
-board = []
-
-tiles.each_slice(3) do |a|
-  board << a
-end
-
 # approach 1
 # first, make a list or data structure of all the matching edges
 # the corner tiles will be the only ones that only have two matching edges with other tiles
@@ -175,4 +166,19 @@ puts "corner_ids are #{corners}"
 
 answer = corners.inject(:*)
 
+# Part I
 puts "Answer is #{answer}"
+
+# Part II
+#
+#
+area = tiles.length
+square_side = Math.sqrt(area)
+
+board = []
+
+tiles.each_slice(3) do |a|
+  board << a
+end
+
+
